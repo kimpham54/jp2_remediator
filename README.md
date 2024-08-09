@@ -1,8 +1,8 @@
-# jp2curvtest
+# jp2_remediator
 
 README for the module to validate jp2images
 
-https://pypi.org/project/jp2_remediator/0.0.1/
+https://pypi.org/project/jp2_remediator/
 
 ## Installation
 
@@ -10,5 +10,5 @@ https://pypi.org/project/jp2_remediator/0.0.1/
 pip install jp2_remediator
 python3 -m pip install jp2_remediator
 
-pip install jp2_remediator==0.0.1
+pip install jp2_remediator==0.0.2
 ```

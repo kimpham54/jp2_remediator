@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: jp2_remediator
-Version: 0.0.1
+Version: 0.0.2
 Summary: A module to validate jp2images
 Author-email: Kim Pham <kimpham54@gmail.com>
 Project-URL: Homepage, https://github.com/kimpham54/jp2_remediator
@@ -12,7 +12,7 @@ Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-# jp2curvtest
+# jp2_remediator
 
 README for the module to validate jp2images
 

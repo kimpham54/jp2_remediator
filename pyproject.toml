@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jp2_remediator"
+version = "0.0.1"
+description = "A module to validate jp2images"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Kim Pham", email = "kimpham54@gmail.com" },
+    ]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/kimpham54/jp2_remediator"
+Issues = "https://github.com/kimpham54/jp2_remediator/issues"

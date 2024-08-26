@@ -1,9 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-src/jp2_remediator/__init__.py
-src/jp2_remediator/main.py
-src/jp2_remediator.egg-info/PKG-INFO
-src/jp2_remediator.egg-info/SOURCES.txt
-src/jp2_remediator.egg-info/dependency_links.txt
-src/jp2_remediator.egg-info/top_level.txt

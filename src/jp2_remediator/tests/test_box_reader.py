@@ -1,86 +1,100 @@
 import unittest
 import os
 from unittest.mock import patch, mock_open
-from ..box_reader import (
-    read_file,
-    initialize_validator,
-    find_box_position,
-    check_boxes,
-    process_colr_box,
-    process_trc_tag,
-    process_all_trc_tags,
-    write_modified_file
-)
-from jpylyzer import jpylyzer
+from jp2_remediator.box_reader import BoxReader
 from jpylyzer import boxvalidator
-from jpylyzer import byteconv
+import datetime
 
 # Define the path to the test data file
-TEST_DATA_PATH = os.path.join(os.path.dirname(__file__), 'tests', 'sample.jp2')
+TEST_DATA_PATH = os.path.join(os.path.dirname(__file__), 'sample.jp2')
 
 class TestJP2ProcessingWithFile(unittest.TestCase):
 
+    def setUp(self):
+        """Set up a BoxReader instance for each test."""
+        self.reader = BoxReader(TEST_DATA_PATH)
+
     def test_read_file_with_valid_path(self):
         # Test reading a valid test file
-        result = read_file(TEST_DATA_PATH)
+        result = self.reader.read_file(TEST_DATA_PATH)
         self.assertIsNotNone(result)  # Ensure file content is not None
         self.assertIsInstance(result, bytes)  # Ensure file content is in bytes
 
     def test_initialize_validator_with_file_content(self):
         # Read file content
-        file_contents = read_file(TEST_DATA_PATH)
+        file_contents = self.reader.read_file(TEST_DATA_PATH)
         if file_contents is None:
             self.fail("Test file could not be read.")
 
         # Initialize validator and check the type
-        validator = initialize_validator(file_contents)
+        self.reader.file_contents = file_contents
+        validator = self.reader.initialize_validator()
         self.assertIsInstance(validator, boxvalidator.BoxValidator)
 
     def test_find_box_position_in_file(self):
         # Read file content
-        file_contents = read_file(TEST_DATA_PATH)
+        file_contents = self.reader.read_file(TEST_DATA_PATH)
         if file_contents is None:
             self.fail("Test file could not be read.")
 
+        # Set the file contents for the reader instance
+        self.reader.file_contents = file_contents
+
         # Find a known box position in the sample file (you should know the expected values)
-        position = find_box_position(file_contents, b'\x6a\x70\x32\x68')
+        position = self.reader.find_box_position(b'\x6a\x70\x32\x68')
         self.assertNotEqual(position, -1)  # Ensure that the box is found
 
     def test_check_boxes_in_file(self):
         # Read file content
-        file_contents = read_file(TEST_DATA_PATH)
+        file_contents = self.reader.read_file(TEST_DATA_PATH)
         if file_contents is None:
             self.fail("Test file could not be read.")
+
+        # Set the file contents for the reader instance
+        self.reader.file_contents = file_contents
         
-        header_offset_position = check_boxes(file_contents)
+        # Call check_boxes
+        header_offset_position = self.reader.check_boxes()
         self.assertIsNotNone(header_offset_position)
 
     def test_process_colr_box_in_file(self):
         # Read file content
-        file_contents = read_file(TEST_DATA_PATH)
+        file_contents = self.reader.read_file(TEST_DATA_PATH)
         if file_contents is None:
             self.fail("Test file could not be read.")
 
-        colr_position = find_box_position(file_contents, b'\x63\x6f\x6c\x72')
+        # Set the file contents for the reader instance
+        self.reader.file_contents = file_contents
+
+        # Find the colr box position
+        colr_position = self.reader.find_box_position(b'\x63\x6f\x6c\x72')
         if colr_position == -1:
             self.fail("'colr' box not found in the test file.")
         
-        header_offset_position = process_colr_box(file_contents, colr_position)
+        # Process the colr box
+        header_offset_position = self.reader.process_colr_box(colr_position)
         self.assertIsNotNone(header_offset_position)
 
-@patch('builtins.open', new_callable=mock_open)
-def test_write_modified_file_with_changes(self, mock_file):
-    # Read file content
-    file_contents = read_file(TEST_DATA_PATH)
-    if file_contents is None:
-        self.fail("Test file could not be read.")
+    @patch('builtins.open', new_callable=mock_open, read_data=b'sample content')
+    def test_write_modified_file_with_changes(self, mock_file):
+        # Read file content (from mock)
+        file_contents = self.reader.read_file(TEST_DATA_PATH)
+        if file_contents is None:
+            self.fail("Test file could not be read.")
 
-    # Modify the file contents slightly using bytes
-    new_file_contents = file_contents + b' modified'  # Append in bytes, not string
-    
-    # Test writing the modified file
-    write_modified_file(TEST_DATA_PATH, new_file_contents, file_contents)
-    mock_file.assert_called_once_with(TEST_DATA_PATH.replace('.jp2', '_modified2.jp2'), 'wb')
+        # Modify the file contents slightly using bytes
+        new_file_contents = file_contents + b' modified'  # Append in bytes, not string
+
+        # Test writing the modified file
+        self.reader.write_modified_file(new_file_contents)
+        timestamp = datetime.datetime.now().strftime("%Y%m%d") # use "%Y%m%d_%H%M%S" for more precision
+        expected_filename = TEST_DATA_PATH.replace('.jp2', f'_modified_{timestamp}.jp2')
+        
+        # Ensure the file was written to the correct file path
+        mock_file.assert_any_call(expected_filename, 'wb')
+        
+        # Ensure the contents were written correctly
+        mock_file().write.assert_called_once_with(b'sample content modified')
 
 if __name__ == '__main__':
     unittest.main()

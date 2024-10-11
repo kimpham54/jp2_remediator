@@ -150,26 +150,13 @@ class BoxReader:
     def write_modified_file(self, new_file_contents):
         """Writes the modified file contents to a new file if changes were made."""
         if new_file_contents != self.file_contents:
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.datetime.now().strftime("%Y%m%d") # use "%Y%m%d_%H%M%S" for more precision
             new_file_path = self.file_path.replace(".jp2", f"_modified_{timestamp}.jp2")
             with open(new_file_path, 'wb') as new_file:
                 new_file.write(new_file_contents)
             print(f"New JP2 file created with modifications: {new_file_path}")
         else:
             print("No modifications were needed. No new file was created.")
-
-# def write_modified_file(self, new_file_contents):
-#     """Writes the modified file contents to a new file with a timestamp if changes were made."""
-#     if new_file_contents != self.file_contents:
-#         # Get the current timestamp
-#         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-#         # Generate a new file path with the timestamp
-#         new_file_path = self.file_path.replace(".jp2", f"_modified_{timestamp}.jp2")
-#         with open(new_file_path, 'wb') as new_file:
-#             new_file.write(new_file_contents)
-#         print(f"New JP2 file created with modifications: {new_file_path}")
-#     else:
-#         print("No modifications were needed. No new file was created.")
 
     def read_jp2_file(self):
         """Main function to read, validate, and modify JP2 files."""
@@ -210,7 +197,8 @@ def process_s3_bucket(bucket_name, prefix=''):
                 reader = BoxReader(download_path)
                 reader.read_jp2_file()
                 # Optionally, upload modified file back to S3
-                s3.upload_file(download_path.replace(".jp2", "_modified2.jp2"), bucket_name, file_path.replace(".jp2", "_modified2.jp2"))
+                timestamp = datetime.datetime.now().strftime("%Y%m%d") # use "%Y%m%d_%H%M%S" for more precision
+                s3.upload_file(download_path.replace(".jp2", f"_modified_{timestamp}.jp2"), bucket_name, file_path.replace(".jp2", f"_modified_{timestamp}.jp2"))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="JP2 file processor")

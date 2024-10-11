@@ -147,18 +147,29 @@ class BoxReader:
 
         return new_file_contents
 
-def write_modified_file(self, new_file_contents):
-    """Writes the modified file contents to a new file with a timestamp if changes were made."""
-    if new_file_contents != self.file_contents:
-        # Get the current timestamp
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        # Generate a new file path with the timestamp
-        new_file_path = self.file_path.replace(".jp2", f"_modified_{timestamp}.jp2")
-        with open(new_file_path, 'wb') as new_file:
-            new_file.write(new_file_contents)
-        print(f"New JP2 file created with modifications: {new_file_path}")
-    else:
-        print("No modifications were needed. No new file was created.")
+    def write_modified_file(self, new_file_contents):
+        """Writes the modified file contents to a new file if changes were made."""
+        if new_file_contents != self.file_contents:
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            new_file_path = self.file_path.replace(".jp2", f"_modified_{timestamp}.jp2")
+            with open(new_file_path, 'wb') as new_file:
+                new_file.write(new_file_contents)
+            print(f"New JP2 file created with modifications: {new_file_path}")
+        else:
+            print("No modifications were needed. No new file was created.")
+
+# def write_modified_file(self, new_file_contents):
+#     """Writes the modified file contents to a new file with a timestamp if changes were made."""
+#     if new_file_contents != self.file_contents:
+#         # Get the current timestamp
+#         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+#         # Generate a new file path with the timestamp
+#         new_file_path = self.file_path.replace(".jp2", f"_modified_{timestamp}.jp2")
+#         with open(new_file_path, 'wb') as new_file:
+#             new_file.write(new_file_contents)
+#         print(f"New JP2 file created with modifications: {new_file_path}")
+#     else:
+#         print("No modifications were needed. No new file was created.")
 
     def read_jp2_file(self):
         """Main function to read, validate, and modify JP2 files."""

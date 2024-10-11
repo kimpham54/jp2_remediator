@@ -6,6 +6,7 @@ from jpylyzer import jpylyzer
 from jpylyzer import boxvalidator
 from jpylyzer import byteconv
 
+
 def read_file(file_path):
     """Reads the file content from the given path."""
     try:
@@ -27,14 +28,14 @@ def find_box_position(file_contents, box_hex):
     return file_contents.find(box_hex)
 
 def check_boxes(file_contents):
-    """Checks for 'jp2h' and 'colr' boxes in the file contents."""
-    jp2h_position = find_box_position(file_contents, b'\x6a\x70\x32\x68')
+    """Checks for prescence of 'jp2h' and 'colr' boxes in the file contents."""
+    jp2h_position = find_box_position(file_contents, b'\x6a\x70\x32\x68') # search hex for 'jp2h'
     if jp2h_position != -1:
         print(f"'jp2h' found at byte position: {jp2h_position}")
     else:
         print("'jp2h' not found in the file.")
     
-    colr_position = find_box_position(file_contents, b'\x63\x6f\x6c\x72')
+    colr_position = find_box_position(file_contents, b'\x63\x6f\x6c\x72') # search hex for 'colr'
     if colr_position != -1:
         print(f"'colr' found at byte position: {colr_position}")
     else:
@@ -48,15 +49,15 @@ def process_colr_box(file_contents, colr_position):
     """Processes the 'colr' box to determine header offset position."""
     if colr_position != -1:
         print(f"'colr' found at byte position: {colr_position}")
-        meth_byte_position = colr_position + 4
+        meth_byte_position = colr_position + 4 # ISO/IEC 15444-1:2019(E) Figure I.10 colr specification box, byte position of METH value after 'colr' 
         meth_value = file_contents[meth_byte_position]
         print(f"'meth' value: {meth_value} at byte position: {meth_byte_position}")
         
         if meth_value == 1:
-            header_offset_position = meth_byte_position + 7
+            header_offset_position = meth_byte_position + 7 # ISO/IEC 15444-1:2019(E) Table I.11 colr specification box, if meth is 1 then color profile starts at byte position 7 after 'colr' 
             print(f"'meth' is 1, setting header_offset_position to: {header_offset_position}")
         elif meth_value == 2:
-            header_offset_position = meth_byte_position + 3
+            header_offset_position = meth_byte_position + 3 # ISO/IEC 15444-1:2019(E) Table I.11 colr specification box, if meth is 1 then color profile starts at byte position 3 after 'colr' 
             print(f"'meth' is 2, setting header_offset_position to: {header_offset_position}")
         else:
             print(f"'meth' value {meth_value} is not recognized (must be 1 or 2).")
@@ -75,15 +76,15 @@ def process_trc_tag(trc_hex, trc_name, new_contents, header_offset_position):
         return new_contents
 
     print(f"'{trc_name}' found at byte position: {trc_position}")
-    trc_tag_entry = new_contents[trc_position:trc_position + 12]
+    trc_tag_entry = new_contents[trc_position:trc_position + 12] # 12-byte tag entry length
 
     if len(trc_tag_entry) != 12:
         print(f"Could not extract the full 12-byte '{trc_name}' tag entry.")
         return new_contents
 
-    trc_tag_signature = trc_tag_entry[0:4]
-    trc_tag_offset = int.from_bytes(trc_tag_entry[4:8], byteorder='big')
-    trc_tag_size = int.from_bytes(trc_tag_entry[8:12], byteorder='big')
+    trc_tag_signature = trc_tag_entry[0:4] # ICC.1:2022 Table 24 type signature
+    trc_tag_offset = int.from_bytes(trc_tag_entry[4:8], byteorder='big') # ICC.1:2022 Table 24 reserved 0's
+    trc_tag_size = int.from_bytes(trc_tag_entry[8:12], byteorder='big') # ICC.1:2022 Table 24 count value
     print(f"'{trc_name}' Tag Signature: {trc_tag_signature}")
     print(f"'{trc_name}' Tag Offset: {trc_tag_offset}")
     print(f"'{trc_name}' Tag Size: {trc_tag_size}")
@@ -92,14 +93,14 @@ def process_trc_tag(trc_hex, trc_name, new_contents, header_offset_position):
         print(f"Cannot calculate 'curv_{trc_name}_position' due to an unrecognized 'meth' value.")
         return new_contents
 
-    curv_trc_position = trc_tag_offset + header_offset_position
-    curv_profile = new_contents[curv_trc_position:curv_trc_position + 12]
+    curv_trc_position = trc_tag_offset + header_offset_position # start of curv profile data
+    curv_profile = new_contents[curv_trc_position:curv_trc_position + 12] # 12-byte curv profile data length
 
     if len(curv_profile) < 12:
         print(f"Could not read the full 'curv' profile data for {trc_name}.")
         return new_contents
 
-    curv_signature = curv_profile[0:4].decode('utf-8')
+    curv_signature = curv_profile[0:4].decode('utf-8') # ICC.1:2022 Table 35 curveType encoding
     curv_reserved = int.from_bytes(curv_profile[4:8], byteorder='big')
     curv_trc_gamma_n = int.from_bytes(curv_profile[8:12], byteorder='big')
 
@@ -107,7 +108,7 @@ def process_trc_tag(trc_hex, trc_name, new_contents, header_offset_position):
     print(f"'curv' Reserved Value: {curv_reserved}")
     print(f"'curv_{trc_name}_gamma_n' Value: {curv_trc_gamma_n}")
 
-    curv_trc_field_length = curv_trc_gamma_n * 2 + 12
+    curv_trc_field_length = curv_trc_gamma_n * 2 + 12 # ICC.1:2022 Table 35 2n field length
     print(f"'curv_{trc_name}_field_length': {curv_trc_field_length}")
 
     if trc_tag_size != curv_trc_field_length:

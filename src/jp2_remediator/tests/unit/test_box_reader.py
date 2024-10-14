@@ -3,10 +3,11 @@ import os
 from unittest.mock import patch, mock_open
 from jp2_remediator.box_reader import BoxReader
 from jpylyzer import boxvalidator
+from project_paths import paths
 import datetime
 
 # Define the path to the test data file
-TEST_DATA_PATH = os.path.join(os.path.dirname(__file__), 'sample.jp2')
+TEST_DATA_PATH = os.path.join(paths.dir_unit_resources, 'sample.jp2')
 
 class TestJP2ProcessingWithFile(unittest.TestCase):
 

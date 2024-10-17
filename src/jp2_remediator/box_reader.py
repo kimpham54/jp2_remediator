@@ -79,9 +79,9 @@ class BoxReader:
                 f" 'meth' value: {
                     meth_value
                     } at byte position: {
-                    meth_byte_position
-                    }"
-            )
+                        meth_byte_position
+                        }"
+                        )
             if meth_value == 1:
                 header_offset_position = (
                     meth_byte_position + 7

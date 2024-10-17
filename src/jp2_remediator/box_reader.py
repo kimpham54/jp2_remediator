@@ -211,9 +211,13 @@ class BoxReader:
 
         if trc_tag_size != curv_trc_field_length:
             print(
-                f"""'{trc_name}' Tag Size ({trc_tag_size}) does not match 'curv_{
+                f"""'{trc_name}' Tag Size ({
+                    trc_tag_size
+                    }) does not match 'curv_{
                     trc_name
-                    }_field_length' ({curv_trc_field_length}). Modifying size-"""
+                    }_field_length' ({
+                        curv_trc_field_length
+                        }). Modifying size-"""
             )
             new_trc_size_bytes = curv_trc_field_length.to_bytes(
                 4,
@@ -291,7 +295,7 @@ def process_s3_bucket(bucket_name, prefix=""):
                 file_path = obj["Key"]
                 print(f"""Processing file: {
                     file_path} from bucket {bucket_name}"""
-                    )
+                )
                 download_path = f"/tmp/{os.path.basename(file_path)}"
                 s3.download_file(bucket_name, file_path, download_path)
                 reader = BoxReader(download_path)

@@ -21,3 +21,17 @@ dependencies = []
 [project.urls]
 Homepage = "https://github.com/kimpham54/jp2_remediator"
 Issues = "https://github.com/kimpham54/jp2_remediator/issues"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".", "src"
+]
+
+[tool.coverage.run]
+omit = [
+  "**/tests/*"
+]
+
+[tool.project-paths]
+dir_unit_out = "src/jp2_remediator/tests/out/"
+dir_unit_resources = "src/jp2_remediator/tests/resources/"

@@ -29,7 +29,7 @@ pip install jp2_remediator==0.0.2
 ## Process all .jp2 files in the bucket:
 `python3 box_reader.py --bucket remediation-folder`
 
-##Process only files with a specific prefix (folder):
+## Process only files with a specific prefix (folder):
 `python3 box_reader.py --bucket remediation-folder --prefix testbatch_20240923`
 
 `python3 box_reader.py --help`

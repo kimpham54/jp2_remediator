@@ -55,6 +55,7 @@ jobs:
       # Compare coverage with the base branch
       - name: Compare coverage
         run: |
+         pip install diff-cover
          git checkout main
          python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
          python -m coverage xml -o coverage-base.xml

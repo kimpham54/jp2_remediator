@@ -75,11 +75,11 @@ class BoxReader:
             """ ISO/IEC 15444-1:2019(E) Figure I.10 colr specification box
             byte position of METH value after 'colr' """
             meth_value = self.file_contents[meth_byte_position]
-            print(f" 'meth' value: {
-                    meth_value
-                    } at byte position: {
-                        meth_byte_position
-                        }")
+            print(
+                f"""'meth' value: {meth_value} at byte position: {
+                    meth_byte_position
+                    }"""
+                    )
             if meth_value == 1:
                 header_offset_position = (
                     meth_byte_position + 7
@@ -88,9 +88,9 @@ class BoxReader:
                 if meth is 1 then color profile starts
                 at byte position 7 after 'colr' """
                 print(
-                    f"'meth' is 1, setting header_offset_position to: {
+                    f"""'meth' is 1, setting header_offset_position to: {
                         header_offset_position
-                        }"
+                        }"""
                 )
             elif meth_value == 2:
                 header_offset_position = (
@@ -101,9 +101,9 @@ class BoxReader:
                 at byte position 3 after 'colr' """
 
                 print(
-                    f"'meth' is 2, setting header_offset_position to: {
+                    f"""'meth' is 2, setting header_offset_position to: {
                         header_offset_position
-                        } (start of ICC profile)"
+                        } (start of ICC profile)"""
                 )
             else:
                 print(
@@ -154,9 +154,9 @@ class BoxReader:
 
         if header_offset_position is None:
             print(
-                f"Cannot calculate 'curv_{
+                f"""Cannot calculate 'curv_{
                     trc_name
-                    }_position' due to an unrecognized 'meth' value."
+                    }_position' due to an unrecognized 'meth' value."""
             )
             return new_contents
 

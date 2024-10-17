@@ -293,9 +293,9 @@ def process_s3_bucket(bucket_name, prefix=""):
         for obj in response["Contents"]:
             if obj["Key"].lower().endswith(".jp2"):
                 file_path = obj["Key"]
-                print(f"""Processing file: {
-                    file_path} from bucket {bucket_name}"""
-                )
+                print(f"""Processing file: {file_path} from bucket {
+                    bucket_name
+                    }""")
                 download_path = f"/tmp/{os.path.basename(file_path)}"
                 s3.download_file(bucket_name, file_path, download_path)
                 reader = BoxReader(download_path)

@@ -1,6 +1,7 @@
 import sys
 import os
 
+
 def main():
     if len(sys.argv) != 3:
         print("Usage: python script.py <folder_path1> <folder_path2>")
@@ -20,12 +21,14 @@ def main():
     print(f"Folder 1: {folder_path1}")
     print(f"Folder 2: {folder_path2}")
 
+
 if __name__ == "__main__":
     main()
 
 
 def hello_world():
     print("Hello, world!")
+
 
 def add_one(number):
     return number + 1

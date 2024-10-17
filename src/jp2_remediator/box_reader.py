@@ -80,7 +80,7 @@ class BoxReader:
                     meth_value} at byte position: {
                     meth_byte_position
                     }"
-                )
+            )
 
             if meth_value == 1:
                 header_offset_position = (

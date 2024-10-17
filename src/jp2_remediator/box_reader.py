@@ -107,9 +107,9 @@ class BoxReader:
                 )
             else:
                 print(
-                    f"'meth' value {
+                    f"""'meth' value {
                         meth_value
-                        } is not recognized (must be 1 or 2)."
+                        } is not recognized (must be 1 or 2)."""
                     )
                 header_offset_position = None
         else:
@@ -196,14 +196,14 @@ class BoxReader:
         for confirmation to proceed, loops through all TRC tags"""
         if curv_trc_gamma_n != 1:
             print(
-                f"Warning: 'curv_{trc_name}_gamma_n' value is {
+                f"""Warning: 'curv_{trc_name}_gamma_n' value is {
                     curv_trc_gamma_n
-                    }, expected 1."
+                    }, expected 1."""
             )
             proceed = input(
-                f"Do you want to proceed with fixing the file {
+                f"""Do you want to proceed with fixing the file {
                     self.file_path
-                    } (y/n): "
+                    } (y/n): """
             ).lower()
             if proceed != "y":
                 print(f"Skipping fixing for {self.file_path}")
@@ -211,9 +211,9 @@ class BoxReader:
 
         if trc_tag_size != curv_trc_field_length:
             print(
-                f"'{trc_name}' Tag Size ({trc_tag_size}) does not match 'curv_{
+                f"""'{trc_name}' Tag Size ({trc_tag_size}) does not match 'curv_{
                     trc_name
-                    }_field_length' ({curv_trc_field_length}). Modifying size-"
+                    }_field_length' ({curv_trc_field_length}). Modifying size-"""
             )
             new_trc_size_bytes = curv_trc_field_length.to_bytes(
                 4,

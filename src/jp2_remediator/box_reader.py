@@ -75,13 +75,11 @@ class BoxReader:
             """ ISO/IEC 15444-1:2019(E) Figure I.10 colr specification box
             byte position of METH value after 'colr' """
             meth_value = self.file_contents[meth_byte_position]
-            print(
-                f" 'meth' value: {
+            print(f" 'meth' value: {
                     meth_value
                     } at byte position: {
                         meth_byte_position
-                        }"
-                        )
+                        }")
             if meth_value == 1:
                 header_offset_position = (
                     meth_byte_position + 7

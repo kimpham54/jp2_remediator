@@ -192,19 +192,15 @@ class BoxReader:
             curv_trc_field_length
             }""")
 
-        """Check if curv_trc_gamma_n is not 1 and ask
-        for confirmation to proceed, loops through all TRC tags"""
+        """Check if the curv_trc_gamma_n is not 1,
+        if not then skip processing of file"""
         if curv_trc_gamma_n != 1:
-            self.logger.warning(f"""Warning: 'curv_{
-                trc_name
-                }_gamma_n' value is {
-                curv_trc_gamma_n
-                }, expected 1.""")
-            proceed = input(f"""Do you want to proceed with fixing the file {
-                self.file_path} (y/n)?: """).lower()
-            if proceed != 'y':
-                print(f"Skipping fixing for {self.file_path}")
-                return new_contents
+            self.logger.warning(f"""Warning: In file '{
+                self.file_path
+                }', 'curv_{trc_name}_gamma_n' value is {
+                    curv_trc_gamma_n
+                    }, expected 1. Modification may be required.""")
+            return new_contents
 
         if trc_tag_size != curv_trc_field_length:
             self.logger.warning(f"""'{trc_name}' Tag Size ({

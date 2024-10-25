@@ -34,7 +34,7 @@ jobs:
           pip install flake8
           flake8 --version
           # stop the build if there are flake8 errors
-          flake8 . --count --show-source --statistics
+          flake8 . --count --show-source --statistics --max-line-length 120
 
       - name: Run unit tests
         run: |

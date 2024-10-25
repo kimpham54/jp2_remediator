@@ -71,9 +71,9 @@ jobs:
          python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
          python -m coverage xml -o coverage-base.xml
          git checkout -
-         python diff-cover --compare-branch=main coverage.xml
+         diff-cover --compare-branch=main coverage.xml
          
       # Fail if coverage decreases
       - name: Fail if coverage decreases
         run: |
-          python diff-cover --compare-branch=main coverage.xml --fail-under=100
+         diff-cover --compare-branch=main coverage.xml --fail-under=100

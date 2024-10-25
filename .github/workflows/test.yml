@@ -52,18 +52,21 @@ jobs:
       - name: Fetch base branch
         run: git fetch origin main
         
-      # # Compare coverage with the base branch
-      # - name: Compare coverage
-      #   run: |
-      #    pip install diff-cover
-      #    git checkout main
-      #    python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
-      #    python -m coverage xml -o coverage-base.xml
-      #    git checkout -
-      #    python diff-cover --compare-branch=main coverage.xml
+      # Install diff-cover globally to access it
+      - name: Install diff-cover globally
+        run: pip install --target=/usr/local/bin diff-cover
+
+      # Compare coverage with the base branch
+      - name: Compare coverage
+        run: |
+         git checkout main
+         python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
+         python -m coverage xml -o coverage-base.xml
+         git checkout -
+         python diff-cover --compare-branch=main coverage.xml
          
-      # # Fail if coverage decreases
-      # - name: Fail if coverage decreases
-      #   run: |
-      #     python diff-cover --compare-branch=main coverage.xml --fail-under=100
+      # Fail if coverage decreases
+      - name: Fail if coverage decreases
+        run: |
+          python diff-cover --compare-branch=main coverage.xml --fail-under=100
 

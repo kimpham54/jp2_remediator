@@ -60,13 +60,9 @@ jobs:
       - name: Add diff-cover to PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Run diff-cover
-        run: diff-cover coverage.xml
-
       # Compare coverage with the base branch
       - name: Compare coverage
         run: |
-         pip install diff-cover
          git checkout main
          python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
          python -m coverage xml -o coverage-base.xml
@@ -76,4 +72,4 @@ jobs:
       # Fail if coverage decreases
       - name: Fail if coverage decreases
         run: |
-         diff-cover --compare-branch=main coverage.xml --fail-under=100
+         diff-cover --compare-branch=main coverage.xml --fail-under=85

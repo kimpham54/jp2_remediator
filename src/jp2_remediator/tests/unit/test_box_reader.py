@@ -151,6 +151,32 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
             mock_box_reader.return_value.read_jp2_file.call_count, 2
             )
 
+    def test_jp2h_not_found_logging(self):
+        # Set up file_contents to simulate a missing 'jp2h' box
+        self.reader.file_contents = b"\x00" * 100
+        # Arbitrary content without 'jp2h'
+        # Call the method that should log the debug message
+        self.reader.check_boxes()
+        # Check that the specific debug message was logged
+        self.reader.logger.debug.assert_any_call("'jp2h' not found in file.")
+
+    @patch("builtins.open", new_callable=mock_open)
+    def test_write_modified_file_no_changes(self, mock_file):
+        # Set the file contents to simulate a situation with no modifications
+        original_content = b"original content"
+        self.reader.file_contents = original_content
+
+        # Call write_modified_file with identical content
+        self.reader.write_modified_file(original_content)
+
+        # Ensure that no file was written because there were no modifications
+        mock_file.assert_not_called()
+
+        # Check that the specific debug message was logged
+        self.reader.logger.debug.assert_called_once_with(
+            "No modifications needed. No new file created."
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

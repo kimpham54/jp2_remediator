@@ -13,7 +13,7 @@ TEST_DATA_PATH = os.path.join(paths.dir_unit_resources, "sample.jp2")
 class TestJP2ProcessingWithFile(unittest.TestCase):
 
     def setUp(self):
-        """Set up a BoxReader instance for each test."""
+        # Set up a BoxReader instance for each test.
         self.reader = BoxReader(TEST_DATA_PATH)
         self.reader.logger = MagicMock()  # Mock logger directly
 
@@ -235,11 +235,21 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
 
     # Test for process_trc_tag method with incomplete trc_tag_entry
     def test_process_trc_tag_incomplete_entry(self):
+        # Prepare the test data
         self.reader.file_contents = b"\x00" * 100 + b"\x72\x54\x52\x43" + b"\x00" * 6
-        trc_hex = b"\x72\x54\x52\x43"
+        trc_hex = b"\x72\x54\x52\x43"  # Hex for 'rTRC'
         header_offset_position = 50
-        new_contents = self.reader.process_trc_tag(trc_hex, "rTRC", bytearray(self.reader.file_contents), header_offset_position)
-        self.reader.logger.debug.assert_any_call("Could not extract the full 12-byte 'rTRC' tag entry.")
+        original_contents = bytearray(self.reader.file_contents)
+
+        # Call the method under test
+        new_contents = self.reader.process_trc_tag(trc_hex, "rTRC", original_contents, header_offset_position)
+
+        # Assert that the appropriate debug message was logged
+        expected_message = "Could not extract the full 12-byte 'rTRC' tag entry."
+        self.reader.logger.debug.assert_any_call(expected_message)
+
+        # Assert that new_contents is unchanged
+        self.assertEqual(new_contents, original_contents)
 
     # Test for process_trc_tag: trc_hex not found in new_contents
     def test_process_trc_tag_trc_hex_not_found(self):
@@ -287,87 +297,7 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
             patch.object(self.reader, 'validator') as mock_validator, \
             patch.object(self.reader, 'check_boxes') as mock_check_boxes, \
             patch.object(self.reader, 'process_all_trc_tags') as mock_process_all_trc_tags, \
-            patch.object(self.reader, 'write_modified_file') as mock_write_modified_file:
-
-            # Set up the mock for validator._isValid()
-            mock_validator._isValid.return_value = True
-
-            # Set up return values for other methods
-            mock_check_boxes.return_value = 100  # Example header_offset_position
-            mock_process_all_trc_tags.return_value = b"Modified JP2 content"
-
-            # Call the method under test
-            self.reader.read_jp2_file()
-
-            # Assert that initialize_validator was called once
-            mock_initialize_validator.assert_called_once()
-
-            # Assert that validator._isValid() was called once
-            mock_validator._isValid.assert_called_once()
-
-            # Assert that logger.info was called with correct parameters
-            self.reader.logger.info.assert_called_with("Is file valid?", True)
-
-            # Assert that check_boxes was called once
-            mock_check_boxes.assert_called_once()
-
-            # Assert that process_all_trc_tags was called with the correct header_offset_position
-            mock_process_all_trc_tags.assert_called_once_with(100)
-
-            # Assert that write_modified_file was called with the modified contents
-            mock_write_modified_file.assert_called_once_with(b"Modified JP2 content")
-
-    # Test for read_jp2_file method when file_contents is valid
-    def test_read_jp2_file(self):
-        # Prepare the test data with valid file contents
-        self.reader.file_contents = b"Valid JP2 content"
-
-        # Mock dependent methods and attributes
-        with patch.object(self.reader, 'initialize_validator') as mock_initialize_validator, \
-            patch.object(self.reader, 'validator') as mock_validator, \
-            patch.object(self.reader, 'check_boxes') as mock_check_boxes, \
-            patch.object(self.reader, 'process_all_trc_tags') as mock_process_all_trc_tags, \
-            patch.object(self.reader, 'write_modified_file') as mock_write_modified_file:
-
-            # Set up the mock for validator._isValid()
-            mock_validator._isValid.return_value = True
-
-            # Set up return values for other methods
-            mock_check_boxes.return_value = 100  # Example header_offset_position
-            mock_process_all_trc_tags.return_value = b"Modified JP2 content"
-
-            # Call the method under test
-            self.reader.read_jp2_file()
-
-            # Assert that initialize_validator was called once
-            mock_initialize_validator.assert_called_once()
-
-            # Assert that validator._isValid() was called once
-            mock_validator._isValid.assert_called_once()
-
-            # Assert that logger.info was called with correct parameters
-            self.reader.logger.info.assert_called_with("Is file valid?", True)
-
-            # Assert that check_boxes was called once
-            mock_check_boxes.assert_called_once()
-
-            # Assert that process_all_trc_tags was called with the correct header_offset_position
-            mock_process_all_trc_tags.assert_called_once_with(100)
-
-            # Assert that write_modified_file was called with the modified contents
-            mock_write_modified_file.assert_called_once_with(b"Modified JP2 content")
-
-    # Test for read_jp2_file method when file_contents is valid
-    def test_read_jp2_file(self):
-        # Prepare the test data with valid file contents
-        self.reader.file_contents = b"Valid JP2 content"
-
-        # Mock dependent methods and attributes
-        with patch.object(self.reader, 'initialize_validator') as mock_initialize_validator, \
-            patch.object(self.reader, 'validator') as mock_validator, \
-            patch.object(self.reader, 'check_boxes') as mock_check_boxes, \
-            patch.object(self.reader, 'process_all_trc_tags') as mock_process_all_trc_tags, \
-            patch.object(self.reader, 'write_modified_file') as mock_write_modified_file:
+                patch.object(self.reader, 'write_modified_file') as mock_write_modified_file:
 
             # Set up the mock for validator._isValid()
             mock_validator._isValid.return_value = True
@@ -406,7 +336,7 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
         with patch.object(self.reader, 'initialize_validator') as mock_initialize_validator, \
             patch.object(self.reader, 'check_boxes') as mock_check_boxes, \
             patch.object(self.reader, 'process_all_trc_tags') as mock_process_all_trc_tags, \
-            patch.object(self.reader, 'write_modified_file') as mock_write_modified_file:
+                patch.object(self.reader, 'write_modified_file') as mock_write_modified_file:
 
             # Call the method under test
             self.reader.read_jp2_file()
@@ -546,8 +476,10 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
         self.assertEqual(updated_trc_tag_size, curv_trc_field_length)
 
         # Verify that the appropriate warning was logged
-        expected_warning = f"'{trc_name}' Tag Size ({trc_tag_size}) does not match 'curv_{trc_name}_field_length' ({curv_trc_field_length}). Modifying the size..."
+        expected_warning = f"""'{trc_name}' Tag Size ({trc_tag_size}) does not match 'curv_{trc_name}_field_length' ({
+            curv_trc_field_length}). Modifying the size..."""
         self.reader.logger.warning.assert_any_call(expected_warning)
+
 
 if __name__ == "__main__":
     unittest.main()

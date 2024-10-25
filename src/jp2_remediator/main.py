@@ -1,6 +1,7 @@
 import argparse
 from jp2_remediator.box_reader import BoxReader, process_directory, process_s3_bucket
 
+
 def main():
     parser = argparse.ArgumentParser(description="JP2 file processor")
     parser.add_argument("--file", help="Path to a single JP2 file to process.")
@@ -25,6 +26,7 @@ def main():
         process_s3_bucket(args.bucket, args.prefix)
     else:
         print("Please specify either --file, --directory, or --bucket.")
+
 
 if __name__ == "__main__":
     main()

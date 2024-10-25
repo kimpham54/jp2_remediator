@@ -35,3 +35,6 @@ omit = [
 [tool.project-paths]
 dir_unit_out = "src/jp2_remediator/tests/out/"
 dir_unit_resources = "src/jp2_remediator/tests/resources/"
+
+[tool.flake8]
+max-line-length = 120

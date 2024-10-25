@@ -46,7 +46,7 @@ jobs:
           pip install coverage
           python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
           python -m coverage combine
-          python -m coverage report -m --skip-covered
+          python -m coverage report -m --skip-covered --fail-under=85
           python -m coverage xml
       
       # Fetch base branch for comparison (e.g., main)
@@ -61,16 +61,11 @@ jobs:
       - name: Add diff-cover to PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Compare coverage with the base branch
+      # Compare coverage with the base branch, if decreases fails, if under 85 percent fails
       - name: Compare coverage
         run: |
          git checkout main
          python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
          python -m coverage xml -o coverage-base.xml
          git checkout -
-         diff-cover --compare-branch=main coverage.xml
-         
-      # Fail if coverage decreases
-      - name: Fail if coverage decreases
-        run: |
          diff-cover --compare-branch=main coverage.xml --fail-under=85

@@ -1,7 +1,6 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
-import socket
 from datetime import datetime
 
 LOG_FILE_BACKUP_COUNT = int(os.getenv('LOG_FILE_BACKUP_COUNT', '30'))

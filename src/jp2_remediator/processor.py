@@ -2,16 +2,18 @@ import datetime
 import os
 import boto3
 
-from jp2_remediator.box_reader import BoxReader
-
 
 class Processor:
     """Class to process JP2 files."""
 
+    def __init__(self, factory):
+        """Initialize the Processor with a BoxReader factory."""
+        self.box_reader_factory = factory
+
     def process_file(self, file_path):
         """Process a single JP2 file."""
         print(f"Processing file: {file_path}")
-        reader = BoxReader(file_path)
+        reader = self.box_reader_factory.get_reader(file_path)
         reader.read_jp2_file()
 
     def process_directory(self, directory_path):
@@ -21,7 +23,7 @@ class Processor:
                 if file.lower().endswith(".jp2"):
                     file_path = os.path.join(root, file)
                     print(f"Processing file: {file_path}")
-                    reader = BoxReader(file_path)
+                    reader = self.box_reader_factory.get_reader(file_path)
                     reader.read_jp2_file()
 
     def process_s3_bucket(self, bucket_name, prefix=""):
@@ -38,7 +40,7 @@ class Processor:
                         }""")
                     download_path = f"/tmp/{os.path.basename(file_path)}"
                     s3.download_file(bucket_name, file_path, download_path)
-                    reader = BoxReader(download_path)
+                    reader = self.box_reader_factory.get_reader(download_path)
                     reader.read_jp2_file()
                     # Optionally, upload modified file back to S3
                     timestamp = datetime.datetime.now().strftime(

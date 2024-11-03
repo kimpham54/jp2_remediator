@@ -1,10 +1,11 @@
 import argparse
+from jp2_remediator.box_reader_factory import BoxReaderFactory
 from jp2_remediator.processor import Processor
 
 
 def main():
     """Main entry point for the JP2 file processor."""
-    processor = Processor()
+    processor = Processor(BoxReaderFactory())
 
     parser = argparse.ArgumentParser(description="JP2 file processor")
 

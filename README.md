@@ -15,30 +15,56 @@ pip install jp2_remediator==0.0.2
 
 ## Usage
 
-## Process one file
-`python3 main.py --file tests/test-images/7514499.jp2`
+```bash
+python3 src/jp2_remediator/main.py  -h
 
-`python3 main.py --file tests/test-images/481014278.jp2`
+usage: main.py [-h] {file,directory,bucket} ...
 
-## Process directory
-`python3 main.py --directory tests/test-images/`
+JP2 file processor
 
-## Process Amazon S3 bucket
-`python3 main.py --bucket your-bucket-name --prefix optional-prefix`
+options:
+  -h, --help            show this help message and exit
 
-## Process all .jp2 files in the bucket:
-`python3 main.py --bucket remediation-folder`
+Input source:
+  {file,directory,bucket}
+    file                Process a single JP2 file
+    directory           Process all JP2 files in a directory
+    bucket              Process all JP2 files in an S3 bucket
+```
 
-## Process only files with a specific prefix (folder):
-`python3 main.py --bucket remediation-folder --prefix testbatch_20240923`
+### Process one file
+```bash
+python3 src/jp2_remediator/main.py file tests/test-images/7514499.jp2
 
-`python3 main.py --help`
+python3 src/jp2_remediator/main.py file tests/test-images/481014278.jp2
+```
 
-## Run Tests
-`python3 test_aws_connection.py`
+### Process directory
+```bash
+python3 src/jp2_remediator/main.py directory tests/test-images/
+```
 
-### Run from src folder
-`python3 -m unittest jp2_remediator.tests.unit.test_box_reader`
+### Process all .jp2 files in an S3 bucket:
+```bash
+python3 src/jp2_remediator/main.py bucket remediation-folder
+```
+
+### Process only files with a specific prefix (folder):
+```bash
+python3 src/jp2_remediator/main.py bucket remediation-folder --prefix testbatch_20240923`
+```
+
+## Run tests
+
+### Run integration tests
+```bash
+pytest src/jp2_remediator/tests/integration/
+```
+
+### Run unit tests
+```bash
+pytest src/jp2_remediator/tests/unit/
+```
 
 ## Docker environment
 
@@ -50,4 +76,14 @@ Build Docker image
 Start Docker container
 ```bash
 ./bin/docker-run.sh
+```
+
+## Development environment
+```bash
+python3 -m venv myenv
+source myenv/bin/activate
+export PYTHONPATH="${PYTHONPATH}:src"
+pip install -r requirements.txt
+
+python src/jp2_remediator/main.py -h
 ```

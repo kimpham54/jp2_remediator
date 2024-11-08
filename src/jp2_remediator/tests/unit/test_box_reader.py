@@ -1,7 +1,7 @@
 import unittest
 import os
 from unittest.mock import patch, mock_open, MagicMock
-from jp2_remediator.box_reader import BoxReader, process_directory, process_s3_bucket
+from jp2_remediator.box_reader import BoxReader
 from jpylyzer import boxvalidator
 from project_paths import paths
 import datetime
@@ -137,29 +137,6 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
         )
         self.assertEqual(modified_contents, self.reader.file_contents)
 
-    # Test for process_directory function
-    @patch("jp2_remediator.box_reader.BoxReader")
-    @patch("os.walk", return_value=[("root", [], ["file1.jp2", "file2.jp2"])])
-    @patch("builtins.print")
-    def test_process_directory_with_multiple_files(
-        self, mock_print, mock_os_walk, mock_box_reader
-    ):
-        # Process a dir with multiple jp2 files
-        # Mock the logger for each BoxReader instance created
-        mock_box_reader.return_value.logger = MagicMock()
-
-        # Call process_directory with a dummy path
-        process_directory("dummy_path")
-
-        # Check that each JP2 file in the directory was processed
-        mock_print.assert_any_call("Processing file: root/file1.jp2")
-        mock_print.assert_any_call("Processing file: root/file2.jp2")
-
-        # Ensure each BoxReader instance had its read_jp2_file method called
-        self.assertEqual(
-            mock_box_reader.return_value.read_jp2_file.call_count, 2
-            )
-
     # Test for check_boxes method logging when 'jp2h' not found
     def test_jp2h_not_found_logging(self):
         # Set up file_contents to simulate a missing 'jp2h' box
@@ -186,9 +163,10 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
         mock_file.assert_not_called()
 
         # Check that the specific debug message was logged
-        self.reader.logger.debug.assert_called_once_with(
-            "No modifications needed. No new file created."
-            )
+        self.reader.logger.info.assert_called_once()
+        pattern = r"No modifications needed\. No new file created: .*sample\.jp2"
+        call_args = self.reader.logger.info.call_args
+        self.assertRegex(call_args[0][0], pattern)
 
     # Test for process_colr_box method when meth_value == 1
     def test_process_colr_box_meth_value_1(self):
@@ -316,7 +294,7 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
             mock_validator._isValid.assert_called_once()
 
             # Assert that logger.info was called with correct parameters
-            self.reader.logger.info.assert_called_with("Is file valid?", True)
+            self.reader.logger.info.assert_called_with("Is file valid? True")
 
             # Assert that check_boxes was called once
             mock_check_boxes.assert_called_once()
@@ -346,82 +324,6 @@ class TestJP2ProcessingWithFile(unittest.TestCase):
             mock_check_boxes.assert_not_called()
             mock_process_all_trc_tags.assert_not_called()
             mock_write_modified_file.assert_not_called()
-
-    # Test for process_s3_bucket function
-    @patch("jp2_remediator.box_reader.boto3.client")
-    @patch("jp2_remediator.box_reader.BoxReader")
-    @patch("builtins.print")
-    def test_process_s3_bucket(self, mock_print, mock_box_reader, mock_boto3_client):
-        # Set up the mock S3 client
-        mock_s3_client = MagicMock()
-        mock_boto3_client.return_value = mock_s3_client
-
-        # Define the bucket name and prefix
-        bucket_name = "test-bucket"
-        prefix = "test-prefix"
-
-        # Prepare a fake response for list_objects_v2
-        mock_s3_client.list_objects_v2.return_value = {
-            "Contents": [
-                {"Key": "file1.jp2"},
-                {"Key": "file2.jp2"},
-                {"Key": "file3.txt"},  # Non-JP2 file to test filtering
-            ]
-        }
-
-        # Mock download_file and upload_file methods
-        mock_s3_client.download_file.return_value = None
-        mock_s3_client.upload_file.return_value = None
-
-        # Mock BoxReader instance and its read_jp2_file method
-        mock_reader_instance = MagicMock()
-        mock_box_reader.return_value = mock_reader_instance
-
-        # Call the method under test
-        process_s3_bucket(bucket_name, prefix)
-
-        # Verify that list_objects_v2 was called with the correct parameters
-        mock_s3_client.list_objects_v2.assert_called_once_with(Bucket=bucket_name, Prefix=prefix)
-
-        # Verify that download_file was called for each .jp2 file
-        expected_download_calls = [
-            unittest.mock.call(bucket_name, "file1.jp2", "/tmp/file1.jp2"),
-            unittest.mock.call(bucket_name, "file2.jp2", "/tmp/file2.jp2"),
-        ]
-        self.assertEqual(mock_s3_client.download_file.call_args_list, expected_download_calls)
-
-        # Verify that BoxReader was instantiated with the correct download paths
-        expected_boxreader_calls = [
-            unittest.mock.call("/tmp/file1.jp2"),
-            unittest.mock.call("/tmp/file2.jp2"),
-        ]
-        self.assertEqual(mock_box_reader.call_args_list, expected_boxreader_calls)
-
-        # Verify that read_jp2_file was called for each .jp2 file
-        self.assertEqual(mock_reader_instance.read_jp2_file.call_count, 2)
-
-        # Verify that upload_file was called for each .jp2 file
-        upload_calls = mock_s3_client.upload_file.call_args_list
-        self.assertEqual(len(upload_calls), 2)
-        for call in upload_calls:
-            args, _ = call
-            local_file_path = args[0]
-            upload_bucket = args[1]
-            upload_key = args[2]
-            # Check that the local file path includes '_modified_' and ends with '.jp2'
-            self.assertIn("_modified_", local_file_path)
-            self.assertTrue(local_file_path.endswith(".jp2"))
-            # Check that the upload is to the correct bucket and key
-            self.assertEqual(upload_bucket, bucket_name)
-            self.assertIn("_modified_", upload_key)
-            self.assertTrue(upload_key.endswith(".jp2"))
-
-        # Verify that print was called correctly
-        expected_print_calls = [
-            unittest.mock.call(f"Processing file: file1.jp2 from bucket {bucket_name}"),
-            unittest.mock.call(f"Processing file: file2.jp2 from bucket {bucket_name}"),
-        ]
-        mock_print.assert_has_calls(expected_print_calls, any_order=True)
 
     # Test for process_trc_tag: when trc_tag_size != curv_trc_field_length
     def test_process_trc_tag_size_mismatch(self):

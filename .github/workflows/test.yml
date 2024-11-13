@@ -75,7 +75,7 @@ jobs:
         with:
           # GIST_TOKEN is a GitHub personal access token with scope "gist".
           auth: ${{ secrets.GIST_TOKEN }}
-          gistID: 2820ee422d89a9fe10cb7fbd4706eeb5
+          gistID: 67d4eba1556653d896d2d36fcb3e5c7c
           filename: covbadge.json
           label: Coverage
           message: ${{ env.total }}%

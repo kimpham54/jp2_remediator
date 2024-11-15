@@ -66,9 +66,9 @@ jobs:
         run: |
          git checkout main
          python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
-         python -m coverage xml -o coverage-base.xml
+         python -m coverage json -o coverage-base.json
          git checkout -
-         diff-cover --compare-branch=main coverage.xml --fail-under=85
+         diff-cover --compare-branch=main coverage.json --fail-under=85
 
       - name: "Combine"
         run: |

@@ -47,6 +47,7 @@ jobs:
           python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
           python -m coverage combine
           python -m coverage report -m --skip-covered --fail-under=85
+          python -m coverage xml
           python -m coverage json
       
       # Fetch base branch for comparison (e.g., main)
@@ -66,17 +67,17 @@ jobs:
         run: |
          git checkout main
          python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
-         python -m coverage json -o coverage-base.json
+         python -m coverage xml -o coverage-base.xml
          git checkout -
-         diff-cover --compare-branch=main coverage.json --fail-under=85
+         diff-cover --compare-branch=main coverage.xml --fail-under=85
 
-      - name: "Combine"
+      - name: Combine coverage percentage totals
         run: |
           export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
           echo "total=$TOTAL" >> $GITHUB_ENV
           echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
 
-      - name: "Make badge"
+      - name: Make badge
         uses: schneegans/dynamic-badges-action@v1.4.0
         with:
           # GIST_TOKEN is a GitHub personal access token with scope "gist".

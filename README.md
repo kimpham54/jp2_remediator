@@ -1,8 +1,8 @@
 # jp2_remediator
 
-<a href="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml"><img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/kimpham54/67d4eba1556653d896d2d36fcb3e5c7c/raw/covbadge.json"></a>
-
-<a href="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml"><img src="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml/badge.svg"></a>
+<a href="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml"><img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/kimpham54/67d4eba1556653d896d2d36fcb3e5c7c/raw/covbadge.json"></a> <a href="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml"><img src="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml/badge.svg"></a> [![PyPI version](https://badge.fury.io/py/jp2-remediator.svg)](https://badge.fury.io/py/jp2-remediator)
+<!-- pypi badge from https://badge.fury.io/for/py/jp2_remediator -->
+<!-- test and coverage badge from https://github.com/harvard-lts/etd-base-template/wiki -->
 
 README for the module to validate jp2images
 

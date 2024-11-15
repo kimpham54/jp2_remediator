@@ -1,8 +1,8 @@
 # jp2_remediator
 
-<a href="https://github.com/harvard-lts/jp2_remediator/blob/badge/.github/workflows/test.yml"><img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/kimpham54/67d4eba1556653d896d2d36fcb3e5c7c/raw/covbadge.json"></a>
+<a href="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml"><img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/kimpham54/67d4eba1556653d896d2d36fcb3e5c7c/raw/covbadge.json"></a>
 
-<a href="https://github.com/harvard-lts/jp2_remediator/blob/badge/.github/workflows/test.yml"><img src="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml/badge.svg"></a>
+<a href="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml"><img src="https://github.com/harvard-lts/jp2_remediator/actions/workflows/test.yml/badge.svg"></a>
 
 README for the module to validate jp2images
 

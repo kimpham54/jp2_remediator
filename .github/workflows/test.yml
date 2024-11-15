@@ -69,3 +69,16 @@ jobs:
          python -m coverage xml -o coverage-base.xml
          git checkout -
          diff-cover --compare-branch=main coverage.xml --fail-under=85
+
+      - name: "Make badge"
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          # GIST_TOKEN is a GitHub personal access token with scope "gist".
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 67d4eba1556653d896d2d36fcb3e5c7c
+          filename: covbadge.json
+          label: Coverage
+          message: ${{ env.total }}%
+          minColorRange: 50
+          maxColorRange: 90
+          valColorRange: ${{ env.total }}

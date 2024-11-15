@@ -47,7 +47,7 @@ jobs:
           python -m coverage run -p -m pytest src/jp2_remediator/tests/unit
           python -m coverage combine
           python -m coverage report -m --skip-covered --fail-under=85
-          python -m coverage xml
+          python -m coverage json
       
       # Fetch base branch for comparison (e.g., main)
       - name: Fetch base branch

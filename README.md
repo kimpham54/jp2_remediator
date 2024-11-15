@@ -18,7 +18,7 @@ A Python module to validate jp2 images:
 pip install jp2_remediator
 python3 -m pip install jp2_remediator
 
-pip install jp2_remediator==0.0.2
+pip install jp2_remediator==NN.NN.NN (version number)
 ```
 
 ## Usage

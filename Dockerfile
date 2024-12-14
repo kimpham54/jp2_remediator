@@ -14,7 +14,7 @@ RUN apt-get update && \
     useradd -u 55005 -g 55004 -d /home/pyadm -m -s /sbin/nologin pyadm
 
 # Copy the current directory contents into the container at /app
-#COPY . /app
+COPY . /app
 
 # Set the working directory in the container
 WORKDIR /app
@@ -24,6 +24,6 @@ USER pyadm
 ENV PYTHONPATH "${PYTHONPATH}:src"
 
 # Run the Python script
-#ENTRYPOINT ["/usr/local/bin/python3", "src/main.py"]
-CMD ["sh", "-c", "cd /app && bash"]
+ENTRYPOINT ["/usr/local/bin/python3", "src/jp2_remediator/main.py"]
+#CMD ["sh", "-c", "cd /app && bash"]
 

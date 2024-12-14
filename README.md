@@ -81,9 +81,9 @@ Build Docker image
 ./bin/docker-build.sh
 ```
 
-Start Docker container
+Run Docker container as executable
 ```bash
-./bin/docker-run.sh
+./bin/docker-run.sh -h
 ```
 
 ## Development environment

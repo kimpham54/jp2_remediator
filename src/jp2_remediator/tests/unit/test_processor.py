@@ -2,6 +2,7 @@ import unittest
 import pytest
 from unittest.mock import call, patch, MagicMock
 from jp2_remediator.processor import Processor
+import os
 
 
 class TestProcessor:
@@ -130,3 +131,46 @@ class TestProcessor:
             unittest.mock.call(f"Processing file: file2.jp2 from bucket {bucket_name}"),
         ]
         mock_print.assert_has_calls(expected_print_calls, any_order=True)
+
+    @patch("jp2_remediator.processor.os.path.exists", return_value=True)
+    @patch("jp2_remediator.processor.boto3.client", autospec=True)
+    @patch("builtins.print", autospec=True)
+    def test_upload_modified_file(
+        self, mock_print, mock_boto3_client, mock_os_path_exists, processor, mock_box_reader_factory
+    ):
+        # Set up the mock S3 client
+        mock_s3_client = MagicMock()
+        mock_boto3_client.return_value = mock_s3_client
+
+        # Define test parameters
+        bucket_name = "test-bucket"
+        prefix = "test-prefix"
+        output_bucket_name = "output-bucket"
+        output_prefix = "output-prefix/"
+        modified_file_path = "/tmp/test_file_modified_20241218.jp2"
+
+        # Prepare a fake response for list_objects_v2
+        mock_s3_client.list_objects_v2.return_value = {
+            "Contents": [
+                {"Key": "test_file.jp2"},
+            ]
+        }
+
+        # Mock download_file to simulate downloading the file
+        mock_s3_client.download_file.return_value = None
+
+        # Call the method under test
+        processor.process_s3_bucket(bucket_name, prefix, output_bucket_name, output_prefix)
+
+        # Verify that os.path.exists was called
+        mock_os_path_exists.assert_called_with(modified_file_path)
+
+        # Verify that upload_file was called with the correct arguments
+        mock_s3_client.upload_file.assert_called_once_with(
+            modified_file_path,
+            output_bucket_name,
+            os.path.join(output_prefix, os.path.basename(modified_file_path))
+        )
+
+        # Verify print statements for processing and upload
+        mock_print.assert_any_call(f"Processing file: test_file.jp2 from bucket {bucket_name}")

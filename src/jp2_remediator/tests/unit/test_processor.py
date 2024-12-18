@@ -2,7 +2,6 @@ import unittest
 import pytest
 from unittest.mock import call, patch, MagicMock
 from jp2_remediator.processor import Processor
-import os
 
 
 class TestProcessor:

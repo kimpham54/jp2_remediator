@@ -16,17 +16,7 @@ class Processor:
         reader = self.box_reader_factory.get_reader(file_path)
         reader.read_jp2_file()
 
-    def process_directory(self, directory_path):
-        """Process all JP2 files in a given directory."""
-        for root, _, files in os.walk(directory_path):
-            for file in files:
-                if file.lower().endswith(".jp2"):
-                    file_path = os.path.join(root, file)
-                    print(f"Processing file: {file_path}")
-                    reader = self.box_reader_factory.get_reader(file_path)
-                    reader.read_jp2_file()
-
-    def process_s3_bucket(self, bucket_name, prefix=""):
+    def process_s3_bucket(self, bucket_name, prefix="", output_bucket_name=None, output_prefix=""):
         """Process all JP2 files in a given S3 bucket."""
         s3 = boto3.client("s3")
         response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
@@ -46,10 +36,17 @@ class Processor:
                     timestamp = datetime.datetime.now().strftime(
                         "%Y%m%d"
                     )  # use "%Y%m%d_%H%M%S" for more precision
-                    s3.upload_file(
-                        download_path.replace(
-                            ".jp2", f"_modified_{timestamp}.jp2"
-                            ),
-                        bucket_name,
-                        file_path.replace(".jp2", f"_modified_{timestamp}.jp2")
+                    modified_file_path = download_path.replace(
+                        ".jp2", f"_modified_{timestamp}.jp2"
                     )
+                    if os.path.exists(modified_file_path):
+                        target_bucket = output_bucket_name if output_bucket_name else bucket_name
+                        target_key = os.path.join(output_prefix, os.path.basename(modified_file_path))
+                        # Creates new s3 folder if output_prefix doesn't exist
+                        s3.upload_file(
+                            modified_file_path,
+                            target_bucket,
+                            target_key
+                        )
+                    else:
+                        print(f"File {modified_file_path} does not exist, skipping upload.")

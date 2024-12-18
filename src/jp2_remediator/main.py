@@ -44,11 +44,18 @@ def main():
         "bucket", help="Name of the AWS S3 bucket to process JP2 files from"
     )
     bucket_parser.add_argument(
-        "--prefix", help="Prefix of files in the AWS S3 bucket (optional)",
-        default=""
+        "--prefix", help="Prefix of files in the AWS S3 bucket (optional)", default=""
+    )
+    bucket_parser.add_argument(
+        "--output-bucket", help="Name of the AWS S3 bucket to upload modified files (optional)"
+    )
+    bucket_parser.add_argument(
+        "--output-prefix", help="Prefix for uploaded files in the output bucket (optional)", default=""
     )
     bucket_parser.set_defaults(
-        func=lambda args: processor.process_s3_bucket(args.bucket, args.prefix)
+        func=lambda args: processor.process_s3_bucket(
+            args.bucket, args.prefix, args.output_bucket, args.output_prefix
+        )
     )
 
     args = parser.parse_args()

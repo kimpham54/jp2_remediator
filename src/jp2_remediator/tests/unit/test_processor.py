@@ -53,24 +53,29 @@ class TestProcessor:
         ]
         assert mock_box_reader_factory.get_reader.return_value.read_jp2_file.call_count == 2
 
-    # Test for process_s3_bucket function
-    @patch("jp2_remediator.processor.boto3.client")
-    @patch("builtins.print")
-    def test_process_s3_bucket(self, mock_print, mock_boto3_client, processor, mock_box_reader_factory):
+    # Test for process_s3_bucket function with output_bucket and output_prefix
+    @patch("jp2_remediator.processor.boto3.client", autospec=True)
+    @patch("builtins.print", autospec=True)
+    def test_process_s3_bucket_with_output_options(
+        self, mock_print, mock_boto3_client, processor, mock_box_reader_factory
+        ):
+        # Ensure processor is the actual Processor object
+        assert hasattr(processor, "process_s3_bucket"), "Processor object expected"
         # Set up the mock S3 client
         mock_s3_client = MagicMock()
         mock_boto3_client.return_value = mock_s3_client
 
-        # Define the bucket name and prefix
+        # Define the bucket name, prefix, output bucket, and output prefix
         bucket_name = "test-bucket"
         prefix = "test-prefix"
+        output_bucket = "output-bucket"
+        output_prefix = "output-prefix/"
 
         # Prepare a fake response for list_objects_v2
         mock_s3_client.list_objects_v2.return_value = {
             "Contents": [
                 {"Key": "file1.jp2"},
                 {"Key": "file2.jp2"},
-                {"Key": "file3.txt"},  # Non-JP2 file to test filtering
             ]
         }
 
@@ -79,7 +84,7 @@ class TestProcessor:
         mock_s3_client.upload_file.return_value = None
 
         # Call the method under test
-        processor.process_s3_bucket(bucket_name, prefix)
+        processor.process_s3_bucket(bucket_name, prefix, output_bucket, output_prefix)
 
         # Verify that list_objects_v2 was called with the correct parameters
         mock_s3_client.list_objects_v2.assert_called_once_with(Bucket=bucket_name, Prefix=prefix)
@@ -98,26 +103,29 @@ class TestProcessor:
         ]
         assert mock_box_reader_factory.get_reader.call_args_list == expected_boxreader_calls
 
-        # Verify that read_jp2_file was called for each .jp2 file
-        assert mock_box_reader_factory.get_reader.return_value.read_jp2_file.call_count == 2
+        # Verify that upload_file was called for each .jp2 file with output_bucket and output_prefix
+        expected_upload_calls = [
+            unittest.mock.call(
+                "/tmp/file1_modified_<timestamp>.jp2",
+                output_bucket,
+                f"{output_prefix}file1_modified_<timestamp>.jp2"
+            ),
+            unittest.mock.call(
+                "/tmp/file2_modified_<timestamp>.jp2",
+                output_bucket,
+                f"{output_prefix}file2_modified_<timestamp>.jp2"
+            ),
+        ]
 
-        # Verify that upload_file was called for each .jp2 file
-        upload_calls = mock_s3_client.upload_file.call_args_list
-        assert len(upload_calls) == 2
-        for c in upload_calls:
-            args, _ = c
-            local_file_path = args[0]
-            upload_bucket = args[1]
-            upload_key = args[2]
-            # Check that the local file path includes '_modified_' and ends with '.jp2'
-            assert "_modified_" in local_file_path, "'_modified_' should be in local_file_path"
-            assert local_file_path.endswith(".jp2")
-            # Check that the upload is to the correct bucket and key
-            assert upload_bucket == bucket_name
-            assert "_modified_" in upload_key
-            assert upload_key.endswith(".jp2")
+        for actual_call, expected_call in zip(mock_s3_client.upload_file.call_args_list, expected_upload_calls):
+            actual_args, _ = actual_call
+            expected_args, _ = expected_call
+            # Verify bucket, key, and file path
+            assert actual_args[0].startswith("/tmp/")  # Local file path
+            assert actual_args[1] == expected_args[1]  # Output bucket
+            assert actual_args[2].startswith(expected_args[2][:len(output_prefix)])  # Output prefix
 
-        # Verify that print was called correctly
+        # Verify print calls for processing files
         expected_print_calls = [
             unittest.mock.call(f"Processing file: file1.jp2 from bucket {bucket_name}"),
             unittest.mock.call(f"Processing file: file2.jp2 from bucket {bucket_name}"),

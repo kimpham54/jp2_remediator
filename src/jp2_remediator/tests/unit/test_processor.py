@@ -57,8 +57,7 @@ class TestProcessor:
     @patch("jp2_remediator.processor.boto3.client", autospec=True)
     @patch("builtins.print", autospec=True)
     def test_process_s3_bucket_with_output_options(
-        self, mock_print, mock_boto3_client, processor, mock_box_reader_factory
-        ):
+            self, mock_print, mock_boto3_client, processor, mock_box_reader_factory):
         # Ensure processor is the actual Processor object
         assert hasattr(processor, "process_s3_bucket"), "Processor object expected"
         # Set up the mock S3 client

@@ -26,7 +26,6 @@ class Processor:
                     reader = self.box_reader_factory.get_reader(file_path)
                     reader.read_jp2_file()
 
-
     def process_s3_bucket(self, bucket_name, prefix="", output_bucket_name=None, output_prefix=""):
         """Process all JP2 files in a given S3 bucket."""
         s3 = boto3.client("s3")

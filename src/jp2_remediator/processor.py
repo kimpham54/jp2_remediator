@@ -32,7 +32,7 @@ class Processor:
 
         # Generate the output key dynamically if not explicitly provided
         if not output_key:
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.datetime.now().strftime("%Y%m%d")
             output_key = os.path.join(
                 output_prefix,
                 os.path.basename(input_key).replace(".jp2", f"_modified_file_{timestamp}.jp2")
